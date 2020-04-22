@@ -4,38 +4,86 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float velocity = 0.1f;
-    public float jump = 3f;
+    #region Private Fields
+
+    Rigidbody2D myRB;
+    SpriteRenderer myRenderer;
+    Animator myAnim;
+    bool facingRight = true;
+    bool grounded = false;
+    bool canMove = true;
+    float groundCheckRadius = 0.2f;
+
+    #endregion
+
+    #region Public Properties
     
-    private Transform initialPosition;
-    public float positi;
+    public float MaxSpeed;
+    public float JumpPower;
+    public LayerMask GroundLayer;
+    public Transform GroundCheck;
+
+    #endregion
+
+    #region Unity3D Methods
 
     // Start is called before the first frame update
     void Start()
     {
-        initialPosition = this.transform;
-        positi = initialPosition.localPosition.y;
+        myRB = GetComponent<Rigidbody2D >();
+        myRenderer = GetComponent<SpriteRenderer>();
+        myAnim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        if (canMove && grounded && Input.GetAxis("Jump") > 0)
 	    {
-            Debug.Log("Derecha");
-            this.transform.SetPositionAndRotation(new Vector3(this.transform.localPosition.x + velocity, this.transform.localPosition.y), this.transform.localRotation);
+            myAnim.SetBool("IsGrounded", false);
+            myRB.velocity = new Vector2(myRB.velocity.x, 0f);
+            myRB.AddForce(new Vector2(myRB.velocity.x, JumpPower), ForceMode2D.Impulse);
+            grounded = false;
     	}
-        else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-	    {
-            Debug.Log("Izquierda");
-            this.transform.SetPositionAndRotation(new Vector3(this.transform.localPosition.x - velocity, this.transform.localPosition.y), this.transform.localRotation);
+
+        grounded = Physics2D.OverlapCircle(GroundCheck.position, groundCheckRadius, GroundLayer);
+        myAnim.SetBool("IsGrounded", grounded);
+
+        var move = Input.GetAxis("Horizontal");
+
+        if (canMove)
+	    {   
+            if (move > 0 && !facingRight)
+	            Flip();
+            else if(move<0 && facingRight)
+                Flip();
+
+            myRB.velocity =new Vector2(move * MaxSpeed, myRB.velocity.y);
+            myAnim.SetFloat("MoveSpeed",Mathf.Abs(move));
 	    }
-        
-        if (Input.GetKeyDown(KeyCode.Space) && this.transform.localPosition.y >= initialPosition.localPosition.y)
-	    {
-            Debug.Log("Salto");
-            this.transform.SetPositionAndRotation(new Vector3(this.transform.localPosition.x, this.transform.localPosition.y + jump), this.transform.localRotation);
-	    }
-        
+        else
+        {
+            myRB.velocity =new Vector2(0, myRB.velocity.y);
+            myAnim.SetFloat("MoveSpeed",0);
+        }
     }
+
+    #endregion
+
+    #region Public Methods
+
+    public void ToogleCanMove()
+    {
+        canMove = !canMove;
+    }
+
+    #endregion
+
+    #region Private Methods
+    private void Flip()
+    {
+        facingRight = !facingRight;
+        myRenderer.flipX = !myRenderer.flipX;
+    }
+    #endregion
 }
