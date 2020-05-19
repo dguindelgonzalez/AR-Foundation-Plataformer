@@ -17,8 +17,12 @@ public class PlayerHealth : MonoBehaviour
 
     #region Public Properties
 
+    public string EndText = "Has Ganado!";
+    public Image DeathScreen;
+    public CanvasGroup EndGC;
+    public Text EndGameUIText;
     public Image DamageIndicator;
-    public CanvasGroup enGameCanvas;
+    public CanvasGroup EndGameCanvas;
     public float FullHealth;
     public AudioClip PlayerDamaged;
 
@@ -68,7 +72,17 @@ public class PlayerHealth : MonoBehaviour
 
     public void MakeDead()
     {
+        EndText = "Has Perdido!";
+        EndGame();
+        DeathScreen.color = Color.white;
+        Destroy(gameObject);
+    }
 
+    public void EndGame()
+    {
+        EndGameUIText.text = EndText;
+        EndGC.alpha = 1;
+        print(EndText);
     }
 
     #endregion

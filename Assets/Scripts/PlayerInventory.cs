@@ -30,6 +30,10 @@ public class PlayerInventory : MonoBehaviour
     {
         coins++;
         CoinText.text = coins.ToString();
+        if (coins >= 3)
+        {
+            GetComponent<PlayerHealth>().EndGame();
+        }
         //print(coins);
     }
 
