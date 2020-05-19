@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerInventory : MonoBehaviour
 {
@@ -12,15 +13,24 @@ public class PlayerInventory : MonoBehaviour
 
     #region Public Properties
 
+    public Text CoinText;
 
     #endregion
 
+    #region Unity3D Methods
+    private void Start()
+    {
+        CoinText.text = coins.ToString();
+    }
+    #endregion
+
     #region Public Methods
-    
+
     public void AddCoins()
     {
         coins++;
-        print(coins);
+        CoinText.text = coins.ToString();
+        //print(coins);
     }
 
     #endregion
